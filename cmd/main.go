@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/anhthii/staffany-backend/pkg/date"
 	"github.com/anhthii/staffany-backend/pkg/shift"
 	"github.com/anhthii/staffany-backend/pkg/user"
@@ -12,7 +14,7 @@ import (
 )
 
 func main() {
-	dsn := "root:123456@tcp(127.0.0.1:3306)/anystaff?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := os.Getenv("DB_DSN")
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
@@ -36,8 +38,5 @@ func main() {
 	weekService.Route(v1)
 	shiftService.Route(v1)
 
-	r.Run()
-	// t, _ := time.Parse(layoutISO, timeStr)
-	// wyear, week := isoweek.FromDate(t.Year(), t.Month(), t.Day())
-	// fmt.Println(wyear, week)
+	r.Run(":8080")
 }
