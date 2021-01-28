@@ -1,19 +1,14 @@
 package main
 
 import (
-	"github.com/anhthii/anystaff-backend/pkg/date"
-	"github.com/anhthii/anystaff-backend/pkg/shift"
-	"github.com/anhthii/anystaff-backend/pkg/user"
-	"github.com/anhthii/anystaff-backend/pkg/week"
+	"github.com/anhthii/staffany-backend/pkg/date"
+	"github.com/anhthii/staffany-backend/pkg/shift"
+	"github.com/anhthii/staffany-backend/pkg/user"
+	"github.com/anhthii/staffany-backend/pkg/week"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-)
-
-const (
-	layoutISO = "2006-01-02"
-	layoutUS  = "January 2, 2006"
 )
 
 func main() {
@@ -23,8 +18,8 @@ func main() {
 		panic(err)
 	}
 	db.AutoMigrate(&user.User{}, &week.Week{}, &date.Date{}, &shift.Shift{})
-	// timeStr := "2021-01-28"
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	userRepository := user.NewRepository(db)
 	weekRepository := week.NewRepository(db)

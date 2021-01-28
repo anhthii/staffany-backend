@@ -1,6 +1,8 @@
 package shift
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	// pass in any date and create the week containing that date if not exist
@@ -39,7 +41,7 @@ func (r *repository) Update(shift *Shift) error {
 }
 
 func (r *repository) DeleteByID(id uint) error {
-	result := r.db.Where("id = ?", id).Delete(&Shift{})
+	result := r.db.Delete(&Shift{}, id)
 	if result.Error != nil {
 		return result.Error
 	}

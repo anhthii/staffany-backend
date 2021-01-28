@@ -3,7 +3,7 @@ package week
 import (
 	"time"
 
-	"github.com/anhthii/anystaff-backend/pkg/date"
+	"github.com/anhthii/staffany-backend/pkg/date"
 	"gorm.io/gorm"
 )
 

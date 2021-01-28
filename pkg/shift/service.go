@@ -3,7 +3,7 @@ package shift
 import (
 	"net/http"
 
-	"github.com/anhthii/anystaff-backend/pkg/utils"
+	"github.com/anhthii/staffany-backend/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 

@@ -57,10 +57,10 @@ func (s *Service) Login(c *gin.Context) {
 		return
 	}
 
-	if user.Password != params.Password {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong password"})
-		return
-	}
+	// if user.Password != params.Password {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "wrong password"})
+	// 	return
+	// }
 
 	c.JSON(http.StatusOK, gin.H{"success": true, "user_id": user.ID})
 	return

@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/anhthii/anystaff-backend/pkg/date"
-	"github.com/anhthii/anystaff-backend/pkg/shift"
-	"github.com/anhthii/anystaff-backend/pkg/utils"
+	"github.com/anhthii/staffany-backend/pkg/date"
+	"github.com/anhthii/staffany-backend/pkg/shift"
+	"github.com/anhthii/staffany-backend/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,17 +42,14 @@ func (s *Service) GetCurrentWeek(c *gin.Context) {
 	if err == RecordNotFound {
 		now := utils.GetDateString(time.Now())
 		// create current week if not exist
-		weekID, err := s.weekRepo.Create(now, userID)
+		_, err := s.weekRepo.Create(now, userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"week_created": true,
-			"week_id":      weekID,
-		})
-
+		week, err := s.weekRepo.GetCurrentWeek(userID)
+		c.JSON(http.StatusOK, week)
 		return
 	}
 
@@ -87,6 +84,7 @@ func (s *Service) CreateShift(c *gin.Context) {
 	}
 
 	var dateID uint
+	var retDate *date.Date
 
 	// the date contains the shift does not exist
 	// so we have to create the date first
@@ -97,17 +95,19 @@ func (s *Service) CreateShift(c *gin.Context) {
 			UserID: params.UserID,
 		}
 
-		var err error
-		dateID, err = s.dateRepo.Create(&date)
+		d, err := s.dateRepo.Create(&date)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
 
+		retDate = d
+
+	} else {
+		dateID = params.DateID
 	}
 
 	// if date already exists
-	dateID = params.DateID
 
 	shift := shift.Shift{
 		DateID:       dateID,
@@ -124,7 +124,7 @@ func (s *Service) CreateShift(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"shift_id": shiftID})
+	c.JSON(http.StatusCreated, gin.H{"shift_id": shiftID, "date": retDate})
 	return
 }
 

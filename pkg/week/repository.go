@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/anhthii/anystaff-backend/pkg/utils"
+	"github.com/anhthii/staffany-backend/pkg/utils"
 	"gorm.io/gorm"
 )
 

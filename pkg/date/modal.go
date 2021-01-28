@@ -3,7 +3,7 @@ package date
 import (
 	"time"
 
-	"github.com/anhthii/anystaff-backend/pkg/shift"
+	"github.com/anhthii/staffany-backend/pkg/shift"
 	"gorm.io/gorm"
 )
 

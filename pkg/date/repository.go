@@ -1,10 +1,14 @@
 package date
 
-import "gorm.io/gorm"
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	// pass in any date and create the week containing that date if not exist
-	Create(date *Date) (id uint, err error)
+	Create(date *Date) (*Date, error)
 	Publish() error
 }
 
@@ -13,14 +17,16 @@ type repository struct {
 }
 
 // pass in any date and create the week containing that date if not exist
-func (r *repository) Create(date *Date) (id uint, err error) {
-
-	result := r.db.Create(date)
-	if result.Error != nil {
-		return 0, result.Error
+func (r *repository) Create(date *Date) (*Date, error) {
+	err := r.db.Debug().Where("date = ?", date.Date).First(&date).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		result := r.db.Create(date)
+		if result.Error != nil {
+			return nil, result.Error
+		}
 	}
 
-	return date.ID, nil
+	return date, nil
 }
 
 func (r *repository) Publish() error {
