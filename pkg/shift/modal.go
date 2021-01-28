@@ -1,16 +1,23 @@
 package shift
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Shift struct {
-	gorm.Model
+	ID        uint           `gorm:"primarykey" json:"id"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 
-	DateID uint
-	UserID uint
+	DateID uint `json:"date_id"`
+	UserID uint `json:"user_id"`
 
-	QuarterStart uint
-	NumQuarter   uint
+	QuarterStart uint `json:"quarter_start"`
+	NumQuarter   uint `json:"num_quarter"`
 
-	Title       string
-	Description string
+	Title       string `json:"title"`
+	Description string `json:"description"`
 }

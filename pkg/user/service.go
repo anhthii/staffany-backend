@@ -20,8 +20,9 @@ func NewService(repo Repository) *Service {
 }
 
 func (s *Service) Route(g *gin.RouterGroup) {
-	g.POST("/users/sign_up", s.SignUp)
-	g.POST("/users/login", s.Login)
+	users := g.Group("/users")
+	users.POST("/sign_up", s.SignUp)
+	users.POST("/login", s.Login)
 }
 
 func (s *Service) SignUp(c *gin.Context) {

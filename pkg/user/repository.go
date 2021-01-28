@@ -19,6 +19,7 @@ func NewRepository(db *gorm.DB) Repository {
 func (r *repository) Create(username, password string) (id uint, err error) {
 	user := User{
 		UserName: username,
+		// should hash password here
 		Password: password,
 	}
 
