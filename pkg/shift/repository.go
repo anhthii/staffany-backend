@@ -30,11 +30,21 @@ func (r *repository) Create(shift *Shift) (id uint, err error) {
 }
 
 func (r *repository) Update(shift *Shift) error {
-	panic("not implemented") // TODO: Implement
+	result := r.db.Save(shift)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 func (r *repository) DeleteByID(id uint) error {
-	panic("not implemented") // TODO: Implement
+	result := r.db.Where("id = ?", id).Delete(&Shift{})
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
 }
 
 // input a date and return the week containing that date
