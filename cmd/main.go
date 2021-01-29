@@ -19,6 +19,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// bad, never do this in production
 	db.AutoMigrate(&user.User{}, &week.Week{}, &date.Date{}, &shift.Shift{})
 	r := gin.Default()
 	r.Use(cors.Default())
