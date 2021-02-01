@@ -25,6 +25,7 @@ func NewService(weekRepo Repository, dateRepo date.Repository, shiftRepo shift.R
 
 func (s *Service) Route(g *gin.RouterGroup) {
 	weeks := g.Group("/weeks")
+	weeks.GET("/get_by_date", s.GetWeekByDate)
 	weeks.POST("/", s.CreateWeek)
 	weeks.GET("/current_week/:user_id", s.GetCurrentWeek)
 	weeks.POST("/:id/shifts", s.CreateShift)
@@ -37,10 +38,11 @@ type WeekParams struct {
 func (s *Service) GetCurrentWeek(c *gin.Context) {
 	userIDStr := c.Param("user_id")
 	userID := utils.StringToUint(userIDStr)
-	week, err := s.weekRepo.GetCurrentWeek(userID)
+	now := utils.GetDateString(time.Now())
+
+	week, err := s.weekRepo.FindByDateAndUserID(now, userID)
 
 	if err == RecordNotFound {
-		now := utils.GetDateString(time.Now())
 		// create current week if not exist
 		_, err := s.weekRepo.Create(now, userID)
 		if err != nil {
@@ -48,7 +50,35 @@ func (s *Service) GetCurrentWeek(c *gin.Context) {
 			return
 		}
 
-		week, err := s.weekRepo.GetCurrentWeek(userID)
+		week, err := s.weekRepo.FindByDateAndUserID(now, userID)
+		c.JSON(http.StatusOK, week)
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, week)
+	return
+}
+
+func (s *Service) GetWeekByDate(c *gin.Context) {
+	date := c.Query("date")
+	userIdQuery := c.Query("user_id")
+	userID := utils.StringToUint(userIdQuery)
+	// create current week if not exist
+
+	week, err := s.weekRepo.FindByDateAndUserID(date, userID)
+	if err == RecordNotFound {
+		_, err := s.weekRepo.Create(date, userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		week, err := s.weekRepo.FindByDateAndUserID(date, userID)
 		c.JSON(http.StatusOK, week)
 		return
 	}
@@ -102,6 +132,7 @@ func (s *Service) CreateShift(c *gin.Context) {
 		}
 
 		retDate = d
+		dateID = retDate.ID
 
 	} else {
 		dateID = params.DateID
@@ -124,7 +155,13 @@ func (s *Service) CreateShift(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"shift_id": shiftID, "date": retDate})
+	date, err := s.dateRepo.FindByID(dateID, params.UserID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"shift_id": shiftID, "date": date})
 	return
 }
 

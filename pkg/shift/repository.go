@@ -1,6 +1,8 @@
 package shift
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -32,6 +34,8 @@ func (r *repository) Create(shift *Shift) (id uint, err error) {
 }
 
 func (r *repository) Update(shift *Shift) error {
+
+	fmt.Printf("shift = %+v\n", shift)
 	result := r.db.Save(shift)
 	if result.Error != nil {
 		return result.Error
@@ -51,5 +55,11 @@ func (r *repository) DeleteByID(id uint) error {
 
 // input a date and return the week containing that date
 func (r *repository) FindByID(id uint) (*Shift, error) {
-	panic("not implemented") // TODO: Implement
+	var shift Shift
+	err := r.db.Debug().Where("id = ?", id).First(&shift).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return &shift, nil
 }

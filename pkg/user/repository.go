@@ -1,6 +1,14 @@
 package user
 
-import "gorm.io/gorm"
+import (
+	"errors"
+
+	"gorm.io/gorm"
+)
+
+var (
+	RecordNotFound = errors.New("record not found")
+)
 
 type Repository interface {
 	// pass in any date and create the week containing that date if not exist
@@ -34,8 +42,14 @@ func (r *repository) Create(username, password string) (id uint, err error) {
 func (r *repository) FindByUserName(username string) (*User, error) {
 	var user User
 	result := r.db.Where("user_name = ?", username).First(&user)
-	if result.Error != nil {
-		return nil, result.Error
+	err := result.Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, RecordNotFound
+		}
+
+		return nil, err
 	}
 
 	return &user, nil

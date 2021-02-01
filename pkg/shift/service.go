@@ -1,6 +1,7 @@
 package shift
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/anhthii/staffany-backend/pkg/utils"
@@ -22,7 +23,6 @@ func (s *Service) Route(g *gin.RouterGroup) {
 }
 
 type ShiftParams struct {
-	ID     uint `json:"id"`
 	DateID uint `json:"date_id"`
 	UserID uint `json:"user_id"`
 
@@ -40,17 +40,22 @@ func (s *Service) UpdateShift(c *gin.Context) {
 		return
 	}
 
-	shift := Shift{
-		ID:           params.ID,
-		DateID:       params.DateID,
-		UserID:       params.UserID,
-		QuarterStart: params.QuarterStart,
-		NumQuarter:   params.NumQuarter,
-		Title:        params.Title,
-		Description:  params.Description,
+	shiftIDStr := c.Param("id")
+	shiftID := utils.StringToUint(shiftIDStr)
+
+	shift, err := s.repo.FindByID(shiftID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
-	err := s.repo.Update(&shift)
+	shift.QuarterStart = params.QuarterStart
+	shift.Title = params.Title
+	shift.Description = params.Description
+	shift.NumQuarter = params.NumQuarter
+	fmt.Printf("shift = %+v\n", shift)
+
+	err = s.repo.Update(shift)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return

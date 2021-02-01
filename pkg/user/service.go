@@ -53,8 +53,21 @@ func (s *Service) Login(c *gin.Context) {
 	// naive user login validation, in production i will never do this
 	user, err := s.repo.FindByUserName(params.Username)
 	if err != nil {
+		if err == RecordNotFound {
+			id, err := s.repo.Create(params.Username, params.Password)
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, err)
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"success": true, "user_id": id})
+			return
+		}
+
 		c.JSON(http.StatusInternalServerError, err)
 		return
+
 	}
 
 	// if user.Password != params.Password {

@@ -15,10 +15,8 @@ var (
 type Repository interface {
 	// pass in any date and create the week containing that date if not exist
 	Create(date string, userID uint) (id uint, err error)
-	FindByID(id uint) (*Week, error)
 	// input a date and return the week containing that date
 	FindByDateAndUserID(date string, userID uint) (*Week, error)
-	GetCurrentWeek(userID uint) (*Week, error)
 	Publish() error
 }
 
@@ -58,22 +56,24 @@ func (r *repository) GetCurrentWeek(userID uint) (*Week, error) {
 	return week, nil
 }
 
-func (r *repository) FindByID(id uint) (*Week, error) {
-	panic("not implemented")
-
-}
-
 // input a date and return the week containing that date
 func (r *repository) FindByDateAndUserID(date string, userID uint) (*Week, error) {
-	weekNumber, _ := utils.GetWeekFromDateString(date)
+	_, startDate := utils.GetWeekFromDateString(date)
+	dateInt := utils.DateStringToInt(startDate)
+
 	var week Week
-	result := r.db.Debug().Where("week_number = ? AND user_id = ?", weekNumber, userID).Preload("Dates.Shifts").First(&week)
-	if result.Error != nil {
-		return nil, result.Error
+	result := r.db.Debug().Where("start_date = ? AND user_id = ?", dateInt, userID).Preload("Dates.Shifts").First(&week)
+	err := result.Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, RecordNotFound
+		}
+
+		return nil, err
+
 	}
 
 	return &week, nil
-
 }
 
 func (r *repository) Publish() error {

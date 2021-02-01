@@ -24,6 +24,16 @@ func DateStringToInt(date string) uint64 {
 	return i
 }
 
+func IntToDateString(dateInt uint64) string {
+	s := strconv.Itoa(int(dateInt))
+	return s[0:2] + "-" + s[2:4] + "-" + s[4:6]
+}
+
+func ParseDateString(date string) time.Time {
+	t, _ := time.Parse(layoutISO, date)
+	return t
+}
+
 func GetWeekFromDateString(date string) (weekNumber int, startDate string) {
 	t, _ := time.Parse(layoutISO, date)
 	wyear, week := isoweek.FromDate(t.Year(), t.Month(), t.Day())
@@ -36,6 +46,5 @@ func GetWeekFromDateString(date string) (weekNumber int, startDate string) {
 }
 
 func GetDateString(t time.Time) string {
-
 	return t.Format(layoutISO)
 }
