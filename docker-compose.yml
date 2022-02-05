@@ -1,9 +1,7 @@
 version: "3"
 services:
-  web-echo:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  staffany-backend:
+    image: 1612645/staffany-backend:v0.0.4
     restart: always
     expose:
       - "8080"
