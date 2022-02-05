@@ -27,3 +27,5 @@ WORKDIR /app
 COPY --from=server_builder /app/main .
 
 CMD ["./main"]
+
+EXPOSE 8080
